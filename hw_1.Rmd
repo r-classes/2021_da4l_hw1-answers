@@ -1,6 +1,6 @@
 ---
 title: "hw_1"
-author: "Имя, Отчество, Фамилия"
+author: "Ответ Ответович Ответов"
 output: html_document
 ---
 
@@ -17,7 +17,18 @@ library(tidyverse)
 ![](task_1.1.png)
 
 ```{r}
-# Ответ на задание 1.1
+lower <-  qlnorm(0.1, mean = 3, sd = 0.5)
+upper <- qlnorm(0.9, mean = 3, sd = 0.5)
+res <- plnorm(upper, mean = 3, sd = 0.5) - plnorm(lower, mean = 3, sd = 0.5)
+round(res, 3)
+```
+
+или так
+```{r}
+integrate(function(x){dlnorm(x, 3, 0.5)}, 
+          qlnorm(0.1, mean = 3, sd = 0.5), 
+          qlnorm(0.9, mean = 3, sd = 0.5))$value %>% 
+  round(3)
 ```
 
 ## task 1.2
@@ -27,7 +38,18 @@ library(tidyverse)
 ![](task_1.2.png)
 
 ```{r}
-# Ответ на задание 1.2
+p <- seq(0, 1, by = 0.01)
+
+tibble(p) %>% 
+  ggplot(aes(p)) +
+  stat_function(fun = function(p) dbinom(9, 9+7, p)*dbinom(38, 38+6, p))+
+  labs(x = "оценка биномиальным распределением вероятности слова бабочка быть класса b",
+       y = "значение функции правдоподобия\n(два эксперимента)")
+
+
+values <- dbinom(9, 9+7, p) * dbinom(38, 38+6, p)
+i <- which.max(values)
+p[i]
 ```
 
 ## task 1.3
@@ -37,7 +59,21 @@ library(tidyverse)
 ![](task_1.3.png)
 
 ```{r}
-# Ответ на задание 1.3
+library(fitdistrplus)
+```
+
+```{r}
+read_csv("https://afbo.info/pairs.csv?sEcho=1&iSortingCols=1&iSortCol_0=0&sSortDir_0=asc") %>% 
+  filter(reliability == "high") ->
+  afbo_filtered
+
+exp <- fitdist(afbo_filtered$count_borrowed, distr = "exp", method = "mle")
+
+afbo_filtered %>% 
+  ggplot(aes(count_borrowed))+
+  geom_histogram(aes(y = ..density..))+
+  stat_function(fun = dexp, args = exp$estimate, color = "red")
+
 ```
 
 ## task 1.4
